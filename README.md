@@ -1,4 +1,6 @@
-# CiteDrive-R-Package
+# citedrive-r-package
+
+## CiteDrive - Reference Manager for R Markdown and Quarto
 
 This R Package, which is still in an experimental state, should enable integration between RStudio and CiteDrive in the future. You can install `CiteDrive-R-Package` from this GitHub repository:
 
