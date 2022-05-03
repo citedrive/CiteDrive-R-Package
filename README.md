@@ -1,4 +1,8 @@
-# citedrive-r-package
+<h1 align="center">
+  <br>
+  <a href="https://citedrive.com/"><img src="man/figures/logo.png" alt="CiteDrive R Package" width="300"></a>
+</h1>
+
 
 ## CiteDrive - Reference Manager for R Markdown and Quarto
 
