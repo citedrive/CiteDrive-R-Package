@@ -1,7 +1,9 @@
-# toDo: fetch citation style from github and place into appropriate file to style rMarkdown project
+# accepts github link, fetches .cls file and places it in .//CLS/ folder
+# toDo: insert name.cls in r-markdown file
+
 require("curl")
 
-getCsl <- function(cslURL="https://github.com/citation-style-language/styles/blob/master/academy-of-management-review.csl"){
+getCsl <- function(cslURL){
 
   con <- suppressWarnings(try(url(cslURL), silent=TRUE))
   urlError <- suppressWarnings(try(open.connection(con, open="r", timeout=2), silent=TRUE))
