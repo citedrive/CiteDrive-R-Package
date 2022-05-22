@@ -1,22 +1,27 @@
 # toDo: fetch citation style from github and place into appropriate file to style rMarkdown project
 require("curl")
 
-getCsl <- function(url){
-  #urlValid <- suppressWarnings(try(open.connection(url, open="r", timeout=2), silent=T))
-  #suppressWarnings(try(close.connection(url), silent=T))
+getCsl <- function(cslURL="https://github.com/citation-style-language/styles/blob/master/academy-of-management-review.csl"){
 
-#  if(1){
-    url <- sub(".*github.com", "https://raw.githubusercontent.com", url)
-    url <- sub("/blob", "", url)
+  con <- suppressWarnings(try(url(cslURL), silent=TRUE))
+  urlError <- suppressWarnings(try(open.connection(con, open="r", timeout=2), silent=TRUE))
+  suppressWarnings(try(close.connection(con), silent = TRUE))
 
-    cslName <- sapply(strsplit(url, split = "/"), tail, 1)
+  if(is.null(urlError)){
+    cslURL <- sub(".*github.com", "https://raw.githubusercontent.com", cslURL)
+    cslURL <- sub("/blob", "", cslURL)
 
-    print(cslName)
-    if(grepl("raw.githubusercontent.com/citation-style-language/styles", url, fixed=TRUE) && grepl(".csl", url, fixed=TRUE)){
-      curl_download(url, paste(".//CSL/", cslName, ".xml"))
+    cslName <- sapply(strsplit(cslURL, split = "/"), tail, 1)
+
+    if(grepl("raw.githubusercontent.com/citation-style-language/styles", cslURL, fixed=TRUE) && grepl(".csl", cslName, fixed=TRUE)){
+      dir.create(file.path(".", "//CSL/"), showWarnings = FALSE)
+      curl_download(cslURL, paste(".//CSL/", cslName))
     }
-#  }
-#  else{
-#   print("CSL Url is Invalid\n")
-#  }
+
+    return(cslName)
+  }
+  else{
+   print("CSL URL is Invalid\n")
+  }
+  return("")
 }
