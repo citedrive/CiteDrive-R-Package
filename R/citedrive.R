@@ -1,4 +1,3 @@
-
 getBib <- function(name, url) {
     fileName <- paste(name,".bib",sep="")
     z <- readLines(url)
