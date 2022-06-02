@@ -1,4 +1,4 @@
-# fetches meta data through DOI from semantic scholar using api calls
+# sources metadata from semantic scholar's API endpoint
 # toDo: Decide whether to use citationKey or DOI to fetch data
 # potential idea: use regex provided here:
 # http://web.archive.org/web/20180321212859/https://www.crossref.org/blog/dois-and-matching-regular-expressions/
@@ -116,7 +116,7 @@ isOpenAccess <- function(DOIorPaperID){
 #toDo:
 #add CrossRef function name
 #returns string and opens website or NULL
-paperURL <- function(DOIorPaperID){
+URLSemanticScholar <- function(DOIorPaperID){
   APICall <- paste("https://api.semanticscholar.org/graph/v1/paper/",DOIorPaperID,"?fields=title,url", sep="")
   res <- fromJSON(rawToChar(GET(APICall)$content))
   if(!is.null(res$url)){
@@ -126,7 +126,7 @@ paperURL <- function(DOIorPaperID){
   }
   else{
     print(paste("Error: No URL for", DOIorPaperID, "could be found in Semantic Scholar's Database!"))
-    print("Try using toDo: ADD FUNCTION NAME FOR CROSSREF HERE")
+    print(paste("If you are using DOI try URLCrossRef(", DOIorPaperID, ")", sep = ""))
     return()
   }
 }
@@ -195,7 +195,8 @@ authorInfo <- function(authorID){
 }
 
 #returns R Object or NULL
-findAuthor <- function(authorName){
+#toDo: possibly iterate through aliases and either provide ID or run findAuthor for IDs too
+findAuthorID <- function(authorName){
   APICall <- paste("https://api.semanticscholar.org/graph/v1/author/search?query=", gsub(" ", "+", authorName), sep="")
   res <- fromJSON(rawToChar(GET(APICall)$content))
   if(res$total[1] != 0){
@@ -217,7 +218,12 @@ papersByAuthor <- function(authorID){
     #toDo pick best method for print out
     print(res$data)
     print("\nor\n")
-    subset(res$data$externalIds <- subset(res$data$externalIds, select=c(DOI)))
+    tryCatch(
+      res$data$externalIds <- subset(res$data$externalIds, select=c(DOI)),
+      error = function(e){
+        print("No DOI in Semantic Scholar's Database! Printing other external IDs instead")
+      }
+    )
     return(subset(res$data, select=c(externalIds, title, venue, year, isOpenAccess)))
   }
   else{

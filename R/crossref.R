@@ -33,49 +33,67 @@ URLCrossRef <- function(DOI){
   }
 }
 
-#only prints 20 papers at a time
-#toDo: fix output and iterate through papers list
-findWorksByAuthor <- function(authorName,listSize=20){
-  if(!is.numeric(listSize) || listSize < 0){
-    listSize = 20
-    pageSize = 20
+findWorksByAuthor <- function(authorName,pageSize=20){
+  # assures that page size is between 1 and 1000 to allow maximum amount of data to be feched in one call as per API definition
+  # page sizes > 1000 are fetched and appended afterwards
+  if(!is.numeric(pageSize) || pageSize < 1){
+    pageSize <- 20
+    actualPageSize <- 20
   }
-  else if(listSize > 1000){
-    pageSize = 1000
+  else if(pageSize <= 1000) {
+    actualPageSize <- pageSize
   }
-  APICall <- paste("https://api.crossref.org/works?select=DOI,title,is-referenced-by-count&query.author=", gsub(" ", "+", authorName),"&rows=",pageSize, sep="")
+  else {
+    actualPageSize <- pageSize
+    pageSize <- 1000
+  }
+  #APICall <- paste("https://api.crossref.org/works?select=DOI,type,title,is-referenced-by-count,references-count,author,published&query.author=", gsub(" ", "+", authorName),"&rows=",pageSize, sep="")
+  APICall <- paste("https://api.crossref.org/works?select=DOI,type,title,is-referenced-by-count,references-count,author&query.author=", gsub(" ", "+", authorName),"&rows=",pageSize, sep="")
   res <- GET(APICall, user_agent(userAgentHeader))
 
   if(res$status == "200" && fromJSON(rawToChar(res$content))$message$`total-results` > 0){
     res <- fromJSON(rawToChar(res$content))
-    print("sack")
-    print(res)
-    if(listSize>1000){
-      resTemp <- res
-      tmpListSize <- listSize
-      listSize <- listSize - 1000
+    resTotal <- res$message$`total-results`
+
+    # prevents fetching of data larger than the maximum entires available
+    if(resTotal < pageSize){
+      pageSize <- resTotal
+      APICall <- paste("https://api.crossref.org/works?select=DOI,type,title,is-referenced-by-count,references-count,author&query.author=", gsub(" ", "+", authorName),"&rows=",pageSize, sep="")
+      res <- GET(APICall, user_agent(userAgentHeader))
+      res <- fromJSON(rawToChar(res$content))
+      resTotal <- res$message$`total-results`
+    }
+
+    # fetch and append results > 1000
+    if(actualPageSize > 1000){
+      # prevents fetching of data larger than the maximum entires available
+      if(resTotal < actualPageSize){
+        actualPageSize <- resTotal
+      }
+      tmpPageSize <- actualPageSize
+      tmpPageSize <- tmpPageSize - 1000
       offset <- 1000
-      while(length(res$message$items) && listSize > 0){
-        if(listSize < 1000 && listSize > 0){
-          pageSize <- listSize
-        }
-        APICall <- paste("https://api.crossref.org/works?select=DOI,title,is-referenced-by-count&query.author=", gsub(" ", "+", authorName),"&rows=",pageSize,"&offset=",offset , sep="")
+      resTemp <- res
+
+
+      while(tmpPageSize > 0){
+        #APICall <- paste("https://api.crossref.org/works?select=DOI,type,title,is-referenced-by-count,references-count,author,published&query.author=", gsub(" ", "+", authorName),"&rows=",tmpPageSize,"&offset=",offset , sep="")
+        APICall <- paste("https://api.crossref.org/works?select=DOI,type,title,is-referenced-by-count,references-count,author&query.author=", gsub(" ", "+", authorName),"&rows=",tmpPageSize,"&offset=",offset , sep="")
         res <- GET(APICall, user_agent(userAgentHeader))
         res <- fromJSON(rawToChar(res$content))
-        resTemp <- rbind(resTemp$message$items, res$message$items)
-        #toDo Wrong append, needs to append data not header
 
-        listSize <- listSize - 1000
+        resTemp$message$items <- rbind(resTemp$message$items, res$message$items)
+
+        tmpPageSize <- tmpPageSize - 1000
         offset <- offset + 1000
-        print("ficker")
-        print(res)
       }
-      res <- resTemp
-      listSize <- tmpListSize
+      res$message$items <- resTemp$message$items
+      pageSize <- actualPageSize
     }
-    print(paste("Returning", listSize, "out of",res$message$`total-results`, "results"))
-    print("To query more results provide findWorksByAuthor with listSize parameter")
-    return(res)
+    print(paste("Returning", pageSize, "out of",resTotal, "results"))
+    print("To query more results provide findWorksByAuthor with the desired pageSize parameter")
+
+    return(res$message$items)
   }
   else{
     print(paste("No works by", authorName, "have been found in crossref's database"))
