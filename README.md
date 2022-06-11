@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <a href="https://citedrive.com/"><img src="man/figures/logo.png" alt="CiteDrive R Package" width="300"></a>
+  <a href="https://citedrive.com/"><img src="man/figures/logo.png" alt="CiteDrive R Package" width="150"></a>
 </h1>
 
 
