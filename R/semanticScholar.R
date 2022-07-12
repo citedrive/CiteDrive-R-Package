@@ -136,7 +136,7 @@ references <- function(DOIorPaperID){
   APICall <- paste("https://api.semanticscholar.org/graph/v1/paper/",DOIorPaperID,"?fields=title", sep="")
   paper <- fromJSON(rawToChar(GET(APICall)$content))
   if(!is.null(paper$paperId)){
-    APICall <- paste("https://api.semanticscholar.org/graph/v1/paper/",DOIorPaperID,"/references?fields=externalIds,title,year", sep="")
+    APICall <- paste("https://api.semanticscholar.org/graph/v1/paper/",DOIorPaperID,"/references?fields=externalIds,title,year&limit=1000", sep="")
     res <- fromJSON(rawToChar(GET(APICall)$content))
     subset(res$data$citedPaper$externalIds <- subset(res$data$citedPaper$externalIds, select=c(DOI)))
     print(paste("References for paper ", paper$title, ":", sep = ""))
