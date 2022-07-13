@@ -232,3 +232,67 @@ papersByAuthor <- function(authorID){
   }
 }
 ################################################################################
+
+
+###############################Evaluation author################################
+getAuthorList <- function(DOIVector){
+  authorList <- c()
+
+  for (i in 1:nrow(DOIVector)) {
+    authorList <- rbind(authors(DOIVector[i, ]), authorList)
+  }
+  return(authorList)
+}
+
+#generates dataframe with authors and HirschIndex from citeDriveString
+getHirschIndexList <- function(citeDriveString){
+  authorList <- getAuthorList(getDOIsFromBib(citeDriveString))
+
+  authorList['hIndex'] <- c(0)
+  for (i in 1:nrow(authorList)) {
+    authorList[i, ]$hIndex <- authorInfo(authorList[i, ]$authorId)$hIndex
+  }
+  authorList <- subset(authorList, select = -authorId)
+  return(authorList)
+}
+
+#generates dataframe with authors and PaperCount from citeDriveString
+getPaperCountList <- function(citeDriveString){
+  authorList <- getAuthorList(getDOIsFromBib(citeDriveString))
+
+  authorList['paperCount'] <- c(0)
+  for (i in 1:nrow(authorList)) {
+    authorList[i, ]$paperCount <- authorInfo(authorList[i, ]$authorId)$paperCount
+  }
+  authorList <- subset(authorList, select = -authorId)
+  return(authorList)
+}
+################################################################################
+
+
+###############################Evaluation papers################################
+#generates dataframe with to display citationCount from citeDriveString
+getCitationCountList <- function(citeDriveString){
+  DOIList <- getDOIsFromBib(citeDriveString)
+
+  CitationCountList <- c()
+
+  for (i in 1:nrow(DOIList)) {
+    CitationCountList <- rbind(citationCount(DOIList[i, ]), CitationCountList)
+  }
+
+  return(CitationCountList)
+}
+
+#generates dataframe with to display influentialCitationCount from citeDriveString
+getCitationCountList <- function(citeDriveString){
+  DOIList <- getDOIsFromBib(citeDriveString)
+
+  CitationCountList <- c()
+
+  for (i in 1:nrow(DOIList)) {
+    CitationCountList <- rbind(influentialCitationCount(DOIList[i, ]), CitationCountList)
+  }
+
+  return(CitationCountList)
+}
