@@ -1,22 +1,16 @@
-# sources metadata from semantic scholar's API endpoint
-# toDo: Decide whether to use citationKey or DOI to fetch data
-# potential idea: use regex provided here:
-# http://web.archive.org/web/20180321212859/https://www.crossref.org/blog/dois-and-matching-regular-expressions/
-# to check if DOI or citationKey was used
-
-#dummy DOI 10.2337/dc12-1805
+################################################################################
+##########################SEMANTIC SCHOLAR integration##########################
+########################https://www.semanticscholar.org#########################
+########################https://api.semanticscholar.org#########################
+################################################################################
 
 require(httr)
 require(jsonlite)
 
-#utility functions#
-#getDOI <- function(citationKey){
-
-#}
-################################################################################
-
 ##############################data sourced by paper#############################
-#returns string or NULL
+# input:  String (DOI or paperID)
+# output: String or NULL
+# Description: Finds and returns abstract of a given paper
 abstract <- function(DOIorPaperID){
   APICall <- paste("https://api.semanticscholar.org/graph/v1/paper/",DOIorPaperID,"?fields=title,abstract", sep="")
   res <- fromJSON(rawToChar(GET(APICall)$content))
@@ -30,7 +24,9 @@ abstract <- function(DOIorPaperID){
   }
 }
 
-#returns R Object or NULL
+# input:  String (DOI or paperID)
+# output: R Object or NULL
+# Description: Returns list of authors for a given paper
 authors <- function(DOIorPaperID){
   APICall <- paste("https://api.semanticscholar.org/graph/v1/paper/",DOIorPaperID,"?fields=title,authors", sep="")
   res <- fromJSON(rawToChar(GET(APICall)$content))
@@ -44,7 +40,9 @@ authors <- function(DOIorPaperID){
   }
 }
 
-#returns integer or NULL
+# input:  String (DOI or paperID)
+# output: int or NULL
+# Description: Returns the number of citations of a given paper
 citationCount <- function(DOIorPaperID){
   APICall <- paste("https://api.semanticscholar.org/graph/v1/paper/",DOIorPaperID,"?fields=title,citationCount", sep="")
   res <- fromJSON(rawToChar(GET(APICall)$content))
@@ -58,7 +56,9 @@ citationCount <- function(DOIorPaperID){
   }
 }
 
-#returns R Object or NULL
+# input:  String (DOI or paperID)
+# output: String or NULL
+# Description: Returns the field of study of a given paper
 fieldsOfStudy <- function(DOIorPaperID){
   APICall <- paste("https://api.semanticscholar.org/graph/v1/paper/",DOIorPaperID,"?fields=title,fieldsOfStudy", sep="")
   res <- fromJSON(rawToChar(GET(APICall)$content))
@@ -73,6 +73,9 @@ fieldsOfStudy <- function(DOIorPaperID){
 }
 
 #returns R Object of 10 entries or NULL
+# input:  String (keywords)
+# output: R Object or NULL
+# Description: Find papers matching a keyword
 findPapers <- function(keywords){
   APICall <- paste("https://api.semanticscholar.org/graph/v1/paper/search?query==", gsub(" ", "+", keywords),"&fields=externalIds,title,year,fieldsOfStudy,isOpenAccess", sep="")
   res <- fromJSON(rawToChar(GET(APICall)$content))
@@ -86,7 +89,9 @@ findPapers <- function(keywords){
   }
 }
 
-#returns integer or NULL
+# input:  String (DOI or paperID)
+# output: int or NULL
+# Description: Returns the influential citation count for a given paper
 influentialCitationCount <- function(DOIorPaperID){
   APICall <- paste("https://api.semanticscholar.org/graph/v1/paper/",DOIorPaperID,"?fields=title,influentialCitationCount", sep="")
   res <- fromJSON(rawToChar(GET(APICall)$content))
@@ -100,7 +105,9 @@ influentialCitationCount <- function(DOIorPaperID){
   }
 }
 
-#returns BOOL or NULL
+# input:  String (DOI or paperID)
+# output: boolean or NULL
+# Description: Returns true if a paper is open access, false if it isn't
 isOpenAccess <- function(DOIorPaperID){
   APICall <- paste("https://api.semanticscholar.org/graph/v1/paper/",DOIorPaperID,"?fields=isOpenAccess", sep="")
   res <- fromJSON(rawToChar(GET(APICall)$content))
@@ -113,9 +120,9 @@ isOpenAccess <- function(DOIorPaperID){
   }
 }
 
-#toDo:
-#add CrossRef function name
-#returns string and opens website or NULL
+# input:  String (DOI or paperID)
+# output: String or NULL
+# Description: Returns a link to a paper corresponding to a DOI or paperID and opens it
 URLSemanticScholar <- function(DOIorPaperID){
   APICall <- paste("https://api.semanticscholar.org/graph/v1/paper/",DOIorPaperID,"?fields=title,url", sep="")
   res <- fromJSON(rawToChar(GET(APICall)$content))
@@ -126,13 +133,15 @@ URLSemanticScholar <- function(DOIorPaperID){
   }
   else{
     print(paste("Error: No URL for", DOIorPaperID, "could be found in Semantic Scholar's Database!"))
-    print(paste("If you are using DOI try URLCrossRef(", DOIorPaperID, ")", sep = ""))
+    print(paste("If you are using DOI try URLCrossRef(", DOIorPaperID, ") instead", sep = ""))
     return()
   }
 }
 
-#returns string and opens website or NULL
-references <- function(DOIorPaperID){
+# input:  String (DOI)
+# output: R Object or NULL
+# Description: Returns references for a given DOI
+referencesSemanticScholar <- function(DOIorPaperID){
   APICall <- paste("https://api.semanticscholar.org/graph/v1/paper/",DOIorPaperID,"?fields=title", sep="")
   paper <- fromJSON(rawToChar(GET(APICall)$content))
   if(!is.null(paper$paperId)){
@@ -148,7 +157,9 @@ references <- function(DOIorPaperID){
   }
 }
 
-#returns integer or NULL
+# input:  String (DOI or paperID)
+# output: int or NULL
+# Description: Returns the amount of references of the paper
 referenceCount <- function(DOIorPaperID){
   APICall <- paste("https://api.semanticscholar.org/graph/v1/paper/",DOIorPaperID,"?fields=title,referenceCount", sep="")
   res <- fromJSON(rawToChar(GET(APICall)$content))
@@ -162,7 +173,9 @@ referenceCount <- function(DOIorPaperID){
   }
 }
 
-#returns string or NULL
+# input:  String (DOI or paperID)
+# output: String or NULL
+# Description: Returns a short summary of the paper
 tldr <- function(DOIorPaperID){
   APICall <- paste("https://api.semanticscholar.org/graph/v1/paper/",DOIorPaperID,"?fields=title,tldr", sep="")
   res <- fromJSON(rawToChar(GET(APICall)$content))
@@ -179,7 +192,9 @@ tldr <- function(DOIorPaperID){
 
 
 #############################data sourced by author#############################
-#returns R Object or NULL
+# input:  int (authorID)
+# output: R Object or NULL
+# Description: Returns name,hIndex and aliases of a given author
 authorInfo <- function(authorID){
   APICall <- paste("https://api.semanticscholar.org/graph/v1/author/", authorID, "/?fields=name,hIndex,aliases", sep="")
   res <- fromJSON(rawToChar(GET(APICall)$content))
@@ -194,8 +209,9 @@ authorInfo <- function(authorID){
   }
 }
 
-#returns R Object or NULL
-#toDo: possibly iterate through aliases and either provide ID or run findAuthor for IDs too
+# input:  String (author name)
+# output: R Object or NULL
+# Description: Returns author id matching a provided name
 findAuthorID <- function(authorName){
   APICall <- paste("https://api.semanticscholar.org/graph/v1/author/search?query=", gsub(" ", "+", authorName), sep="")
   res <- fromJSON(rawToChar(GET(APICall)$content))
@@ -208,7 +224,9 @@ findAuthorID <- function(authorName){
   }
 }
 
-#returns R Object or NULL
+# input:  int (authorID)
+# output: R Object or NULL
+# Description: Returns papers credited to a given author
 papersByAuthor <- function(authorID){
   APICall <- paste("https://api.semanticscholar.org/graph/v1/author/", authorID, "/?fields=name,hIndex,aliases", sep="")
   res <- fromJSON(rawToChar(GET(APICall)$content))
@@ -232,21 +250,29 @@ papersByAuthor <- function(authorID){
   }
 }
 ################################################################################
-
+################################################################################
 
 ###############################Evaluation author################################
-getAuthorList <- function(DOIVector){
+# input:  R Object
+# output: R Object or NULL
+# Description:  Returns list of authors for each entry in a list of DOIs
+getAuthorList <- function(DOIsAsDataFrame){
   authorList <- c()
-
-  for (i in 1:nrow(DOIVector)) {
-    authorList <- rbind(authors(DOIVector[i, ]), authorList)
+  tmp <- c()
+  for (i in 1:nrow(DOIsAsDataFrame)) {
+    authorList <- rbind(authors(DOIsAsDataFrame[i, ]), authorList)
   }
+
+  authorList <- authorList[!duplicated(authorList), ]
   return(authorList)
 }
 
-#generates dataframe with authors and HirschIndex from citeDriveString
-getHirschIndexList <- function(citeDriveString){
-  authorList <- getAuthorList(getDOIsFromBib(citeDriveString))
+# input:  R Object
+# output: R Object or NULL
+# Description:  Returns h-Index of authors from a list of DOIs
+getHirschIndexList <- function(DOIsAsDataFrame){
+  #authorList <- getAuthorList(getDOIsFromBib(citeDriveString))
+  authorList <- getAuthorList(DOIsAsDataFrame)
 
   authorList['hIndex'] <- c(0)
   for (i in 1:nrow(authorList)) {
@@ -256,9 +282,11 @@ getHirschIndexList <- function(citeDriveString){
   return(authorList)
 }
 
-#generates dataframe with authors and PaperCount from citeDriveString
-getPaperCountList <- function(citeDriveString){
-  authorList <- getAuthorList(getDOIsFromBib(citeDriveString))
+# input:  R Object
+# output: R Object or NULL
+# Description:  Returns paper count for each item in a list of DOIS
+getPaperCountList <- function(DOIsAsDataFrame){
+  authorList <- getAuthorList(DOIsAsDataFrame)
 
   authorList['paperCount'] <- c(0)
   for (i in 1:nrow(authorList)) {
@@ -271,9 +299,11 @@ getPaperCountList <- function(citeDriveString){
 
 
 ###############################Evaluation papers################################
-#generates dataframe with to display citationCount from citeDriveString
-getCitationCountList <- function(citeDriveString){
-  DOIList <- getDOIsFromBib(citeDriveString)
+# input:  R Object
+# output: R Object or NULL
+# Description:  Returns citation count count for each item in a list of DOIS
+getCitationCountList <- function(DOIsAsDataFrame){
+  DOIList <- DOIsAsDataFrame
 
   CitationCountList <- c()
 
@@ -281,12 +311,17 @@ getCitationCountList <- function(citeDriveString){
     CitationCountList <- rbind(citationCount(DOIList[i, ]), CitationCountList)
   }
 
+  CitationCountList <- CitationCountList[!duplicated(CitationCountList), ]
   return(CitationCountList)
 }
 
-#generates dataframe with to display influentialCitationCount from citeDriveString
-getCitationCountList <- function(citeDriveString){
-  DOIList <- getDOIsFromBib(citeDriveString)
+# input:  R Object
+# output: R Object or NULL
+# Description:  Returns influential citation count count
+#               for each item in a list of DOIS
+getInfluentialCitationCountList <- function(DOIsAsDataFrame){
+
+  DOIList <- DOIsAsDataFrame
 
   CitationCountList <- c()
 
@@ -294,5 +329,6 @@ getCitationCountList <- function(citeDriveString){
     CitationCountList <- rbind(influentialCitationCount(DOIList[i, ]), CitationCountList)
   }
 
+  CitationCountList <- CitationCountList[!duplicated(CitationCountList), ]
   return(CitationCountList)
 }

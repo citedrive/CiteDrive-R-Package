@@ -1,10 +1,8 @@
-# sources metadata from crossref's API endpoint
-# toDo: Decide whether to use citationKey or DOI to fetch data
-# potential idea: use regex provided here:
-# http://web.archive.org/web/20180321212859/https://www.crossref.org/blog/dois-and-matching-regular-expressions/
-# to check if DOI or citationKey was used
-
-#dummy DOI 10.2337/dc12-1805
+################################################################################
+##############################Crossref integration##############################
+############################https://www.crossref.org############################
+############################https://api.crossref.org############################
+################################################################################
 
 require(httr)
 require(jsonlite)
@@ -13,14 +11,16 @@ require(jsonlite)
 #toDo CHANGE HEADER
 userAgentHeader <- "Testlib (mailto:nadja.stieger@stud.hn.de) based on RStudio/httr/1.4.3"
 
-#returns string and opens website or NULL
+# input:  String (DOI)
+# output: String or NULL
+# Description: Accepts a DOI and returns a link to the corresponding paper
 URLCrossRef <- function(DOI){
   APICall <- paste("https://api.crossref.org/works/", DOI, sep="")
   res <- GET(APICall, user_agent(userAgentHeader))
   if(res$status == "200"){
     res<- fromJSON(rawToChar(res$content))
     srcURL <- res$message$resource$primary$URL
-    srcName <- sapply(strsplit(srcURL, split = "/"), tail, 1)
+    srcName <- res$message$title
     srcType <- res$message$type
 
     browseURL(srcURL)
@@ -33,8 +33,12 @@ URLCrossRef <- function(DOI){
   }
 }
 
+# input:  String (author's name) and int (number of expected results)
+# output: R Object
+# Description: Fetches desired amount of works by a given author
 findWorksByAuthor <- function(authorName,pageSize=20){
-  # assures that page size is between 1 and 1000 to allow maximum amount of data to be feched in one call as per API definition
+  # assures that page size is between 1 and 1000 to allow maximum amount of data
+  # to be feched in one call as per API definition
   # page sizes > 1000 are fetched and appended afterwards
   if(!is.numeric(pageSize) || pageSize < 1){
     pageSize <- 20
@@ -47,7 +51,7 @@ findWorksByAuthor <- function(authorName,pageSize=20){
     actualPageSize <- pageSize
     pageSize <- 1000
   }
-  #APICall <- paste("https://api.crossref.org/works?select=DOI,type,title,is-referenced-by-count,references-count,author,published&query.author=", gsub(" ", "+", authorName),"&rows=",pageSize, sep="")
+
   APICall <- paste("https://api.crossref.org/works?select=DOI,type,title,is-referenced-by-count,references-count,author&query.author=", gsub(" ", "+", authorName),"&rows=",pageSize, sep="")
   res <- GET(APICall, user_agent(userAgentHeader))
 
@@ -101,10 +105,17 @@ findWorksByAuthor <- function(authorName,pageSize=20){
   }
 }
 
-referencedBy <- function(DOI){
-  refs <- URLCrossRef(DOI)
-  refsSubset <- subset(refs$message$reference, select=c("first-page", "DOI", "article-title"))
-  print(refsSubset)
+# input:  String (DOI)
+# output: R Object or NULL
+# Description: Returns references for a given DOI
+referencesCrossRef <- function(DOI){
+  APICall <- paste("https://api.crossref.org/works/", DOI, sep="")
+  res <- GET(APICall, user_agent(userAgentHeader))
+  if(res$status == "200"){
+    res <- fromJSON(rawToChar(res$content))
+
+    return(subset(res$message$reference, select=c("DOI", "unstructured")))
+  }
+  print(paste("DOI", DOI, "was found in Crossref's Database"))
+  return()
 }
-
-
