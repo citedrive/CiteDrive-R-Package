@@ -29,6 +29,7 @@ URLCrossRef <- function(DOI){
   }
   else{
     print(paste("No source for DOI",DOI,"was found"))
+    print("Try using URLSemanticScholar instead!")
     return()
   }
 }
@@ -113,8 +114,7 @@ referencesCrossRef <- function(DOI){
   res <- GET(APICall, user_agent(userAgentHeader))
   if(res$status == "200"){
     res <- fromJSON(rawToChar(res$content))
-
-    return(subset(res$message$reference, select=c("DOI", "unstructured")))
+    return(subset(res$message$reference, select=c("DOI", "article-title", "author", "year")))
   }
   print(paste("DOI", DOI, "was found in Crossref's Database"))
   return()
@@ -123,15 +123,25 @@ referencesCrossRef <- function(DOI){
 # input:  String (DOI)
 # output: R Object or NULL
 # Description: Returns Name ISSN of publishing journal
-workPublishedBy <- function(DOI){
+workPublishedIn <- function(DOI){
   APICall <- paste("https://api.crossref.org/works/", DOI, sep="")
   res <- GET(APICall, user_agent(userAgentHeader))
   if(res$status == "200"){
-    res <- fromJSON(rawToChar(res$content))$message
-    paperTitle <- res$title
-    res <- data.frame(ISSN = res$ISSN)
-    res$Title <-JournalInfo(res$ISSN)$title
-    res$Publisher <- JournalInfo(res$ISSN)$publisher
+    tmp <- fromJSON(rawToChar(res$content))$message
+    paperTitle <- tmp$title
+
+    res <- data.frame(ISSN=character(),
+                      Title=character(),
+                      Publisher=character(),
+                      stringsAsFactors=FALSE)
+
+    for (x in 1:length(tmp$ISSN)) {
+      dta <- c(tmp$ISSN[x],
+              JournalInfo(tmp$ISSN[x])$title,
+              JournalInfo(tmp$ISSN[x])$publisher)
+      res[nrow(res) + 1, ] <- dta
+    }
+
     print(paste("Printing Journal Infomation for", paperTitle, sep = " "))
     return(res)
   }
@@ -206,7 +216,7 @@ findJournalByKeywords <- function(Keywords, numberOfResults=20){
     return(res$message$items)
   }
   else{
-    print(paste("No Journals for", Keywords, "have been found in crossref's database"))
+    print(paste("No Journals for >", Keywords, "< have been found in crossref's database", sep = ""))
     return()
   }
 }
