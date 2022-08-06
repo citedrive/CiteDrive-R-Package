@@ -241,23 +241,6 @@ JournalInfo <- function(ISSN){
 # input:  String (Journal ISSN)
 # output: R Object
 # Description: Fetches inforamtion about Journal by ISSN
-JournalInfo <- function(ISSN){
-  APICall <- paste("https://api.crossref.org/journals/", ISSN, sep="")
-  res <- GET(APICall, user_agent(userAgentHeader))
-  if(res$status == "200"){
-    res <- fromJSON(rawToChar(res$content))$message
-    print(paste("Printing Journal information for", res$title, "published in", res$publisher))
-    return(res)
-  }
-  else{
-    print(paste("No journal with ISSN:",ISSN,"was found in crossref's database"))
-    return()
-  }
-}
-
-# input:  String (Journal ISSN)
-# output: R Object
-# Description: Fetches inforamtion about Journal by ISSN
 JournalWorks <- function(ISSN, numberOfResults=20){
   # assures that page size is between 1 and 1000 to allow maximum amount of data
   # to be feched in one call as per API definition
