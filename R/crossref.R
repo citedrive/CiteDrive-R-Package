@@ -82,7 +82,6 @@ findWorksByAuthor <- function(authorName,numberOfResults=20){
 
 
       while(tmpnumberOfResults > 0){
-        #APICall <- paste("https://api.crossref.org/works?select=DOI,type,title,is-referenced-by-count,references-count,author,published&query.author=", gsub(" ", "+", authorName),"&rows=",tmpnumberOfResults,"&offset=",offset , sep="")
         APICall <- paste("https://api.crossref.org/works?select=DOI,type,title,is-referenced-by-count,references-count,author&query.author=", gsub(" ", "+", authorName),"&rows=",tmpnumberOfResults,"&offset=",offset , sep="")
         res <- GET(APICall, user_agent(userAgentHeader))
         res <- fromJSON(rawToChar(res$content))
@@ -308,4 +307,3 @@ JournalWorks <- function(ISSN, numberOfResults=20){
     return()
   }
 }
-

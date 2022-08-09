@@ -6,6 +6,7 @@
 
 require(httr)
 require(jsonlite)
+require(plyr)
 
 ##############################data sourced by paper#############################
 # input:  String (DOI or paperID)
@@ -76,11 +77,47 @@ fieldsOfStudy <- function(DOIorPaperID){
 # input:  String (keywords)
 # output: R Object or NULL
 # Description: Find papers matching a keyword
-findPapers <- function(keywords){
-  APICall <- paste("https://api.semanticscholar.org/graph/v1/paper/search?query==", gsub(" ", "+", keywords),"&fields=externalIds,title,year,fieldsOfStudy,isOpenAccess", sep="")
+findPapers <- function(keywords, numberOfResults=20){
+  if(!is.numeric(numberOfResults) || numberOfResults < 1){
+    numberOfResults <- 20
+    actualNumberOfResults <- 20
+  }
+  else if(numberOfResults <= 100) {
+    actualNumberOfResults <- numberOfResults
+  }
+  else {
+    actualNumberOfResults <- numberOfResults
+    numberOfResults <- 100
+  }
+
+  APICall <- paste("https://api.semanticscholar.org/graph/v1/paper/search?query==", gsub(" ", "+", keywords),"&fields=externalIds,title,year,fieldsOfStudy,isOpenAccess&limit=",numberOfResults, sep="")
+  # number of total results available for keyword
   res <- fromJSON(rawToChar(GET(APICall)$content))
-  if(res$total[1] != 0){
-    subset(res$data$externalIds <- subset(res$data$externalIds, select=c(DOI)))
+  totalResults <- res$total[1]
+
+  if(totalResults != 0){
+    displayedResults = res$`next`
+
+    #prevent endless fetch-loop if total amount of data < requested size of dataset
+    if(displayedResults < totalResults){
+      #prevent overfetching by dividing query
+      while(displayedResults < actualNumberOfResults){
+        if((actualNumberOfResults - displayedResults) > 100){
+          numberOfResults <- 100
+        }
+        else{
+          numberOfResults <- actualNumberOfResults - displayedResults
+        }
+
+        APICall <- paste("https://api.semanticscholar.org/graph/v1/paper/search?query==", gsub(" ", "+", keywords),"&fields=externalIds,title,year,fieldsOfStudy,isOpenAccess&limit=",numberOfResults,"&offset=",displayedResults, sep="")
+        resTemp <- fromJSON(rawToChar(GET(APICall)$content))
+
+        displayedResults <- resTemp$`next`
+        row.names(resTemp$data$externalIds) <- NULL
+        res$data <- rbind(res$data, resTemp$data)
+      }
+    }
+    print(paste(displayedResults, " of ", totalResults, " papers with the keywords >", keywords, "<:"), sep="")
     return(res$data)
   }
   else{
@@ -147,7 +184,7 @@ referencesSemanticScholar <- function(DOIorPaperID){
   if(!is.null(paper$paperId)){
     APICall <- paste("https://api.semanticscholar.org/graph/v1/paper/",DOIorPaperID,"/references?fields=externalIds,title,year&limit=1000", sep="")
     res <- fromJSON(rawToChar(GET(APICall)$content))
-    subset(res$data$citedPaper$externalIds <- subset(res$data$citedPaper$externalIds, select=c(DOI)))
+    print(res)
     print(paste("References for paper ", paper$title, ":", sep = ""))
     return(res$data)
   }
@@ -181,7 +218,7 @@ tldr <- function(DOIorPaperID){
   res <- fromJSON(rawToChar(GET(APICall)$content))
   if(!is.null(res$paperId)){
   print(paste("Short summary of ", res$title, ":", sep = ""))
-  return(res$tldr)
+  return(res$tldr$text)
   }
   else{
     print(paste("Error:", DOIorPaperID, "not found in Semantic Scholar's Database!"))
@@ -271,7 +308,6 @@ getAuthorList <- function(DOIsAsDataFrame){
 # output: R Object or NULL
 # Description:  Returns h-Index of authors from a list of DOIs
 getHirschIndexList <- function(DOIsAsDataFrame){
-  #authorList <- getAuthorList(getDOIsFromBib(citeDriveString))
   authorList <- getAuthorList(DOIsAsDataFrame)
 
   authorList['hIndex'] <- c(0)
