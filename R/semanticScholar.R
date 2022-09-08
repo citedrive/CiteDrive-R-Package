@@ -291,7 +291,7 @@ papersByAuthor <- function(authorID){
 
 ###############################Evaluation author################################
 # input:  R Object
-# output: R Object or NULL
+# output: R Object
 # Description:  Returns list of authors for each entry in a list of DOIs
 getAuthorList <- function(DOIsAsDataFrame){
   authorList <- c()
@@ -305,7 +305,7 @@ getAuthorList <- function(DOIsAsDataFrame){
 }
 
 # input:  R Object
-# output: R Object or NULL
+# output: R Object
 # Description:  Returns h-Index of authors from a list of DOIs
 getHirschIndexList <- function(DOIsAsDataFrame){
   authorList <- getAuthorList(DOIsAsDataFrame)
@@ -319,7 +319,7 @@ getHirschIndexList <- function(DOIsAsDataFrame){
 }
 
 # input:  R Object
-# output: R Object or NULL
+# output: R Object
 # Description:  Returns paper count for each item in a list of DOIS
 getPaperCountList <- function(DOIsAsDataFrame){
   authorList <- getAuthorList(DOIsAsDataFrame)

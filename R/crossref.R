@@ -9,7 +9,7 @@ require(jsonlite)
 
 #User-Agent header used in all API Calls as per crossref etiquette section at https://api.crossref.org/swagger-ui/index.html
 #toDo CHANGE HEADER
-userAgentHeader <- "Testlib (mailto:nadja.stieger@stud.hn.de) based on RStudio/httr/1.4.3"
+userAgentHeader <- "CiteDriveIntegration (mailto:nadja.stieger@stud.hn.de) based on RStudio/httr/1.4.3"
 
 # input:  String (DOI)
 # output: String or NULL
