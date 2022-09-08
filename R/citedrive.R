@@ -6,6 +6,7 @@ require ("stringr")
 getDOIsFromBib <- function(citeDriveString){
   bibFile <- readLines(citeDriveString)
   DOIs <- bibFile[grepl("doi = ", bibFile)]
+  DOIs <- gsub("\\\\", "", DOIs)
   DOIs <- as.data.frame(str_extract(DOIs, "(?<=doi = \\{).*(?=\\})"))
   return(DOIs)
 }
