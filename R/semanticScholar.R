@@ -29,7 +29,7 @@ abstract <- function(DOIorPaperID){
 # output: R Object or NULL
 # Description: Returns list of authors for a given paper
 authors <- function(DOIorPaperID){
-  APICall <- paste("https://api.semanticscholar.org/graph/v1/paper/",DOIorPaperID,"?fields=title,authors", sep="")
+  APICall <- paste("https://api.semanticscholar.org/graph/v1/paper/",DOIorPaperID,"?fields=title,authors&limit=1000", sep="")
   res <- fromJSON(rawToChar(GET(APICall)$content))
   if(!is.null(res$paperId)){
     return(res$authors)
