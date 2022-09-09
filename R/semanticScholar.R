@@ -32,7 +32,6 @@ authors <- function(DOIorPaperID){
   APICall <- paste("https://api.semanticscholar.org/graph/v1/paper/",DOIorPaperID,"?fields=title,authors", sep="")
   res <- fromJSON(rawToChar(GET(APICall)$content))
   if(!is.null(res$paperId)){
-    print(paste(res$title, "was written by:"))
     return(res$authors)
   }
   else{
@@ -235,7 +234,7 @@ tldr <- function(DOIorPaperID){
 authorInfo <- function(authorID){
   APICall <- paste("https://api.semanticscholar.org/graph/v1/author/", authorID, "/?fields=name,hIndex,aliases", sep="")
   res <- fromJSON(rawToChar(GET(APICall)$content))
-  APICall <- paste("https://api.semanticscholar.org/graph/v1/author/", authorID, "/papers", sep="")
+  APICall <- paste("https://api.semanticscholar.org/graph/v1/author/", authorID, "/papers?limit=1000", sep="")
   res$paperCount <-  nrow(fromJSON(rawToChar(GET(APICall)$content))$data)
   if(!is.null(res$authorId)){
   return(res)
@@ -268,7 +267,7 @@ papersByAuthor <- function(authorID){
   APICall <- paste("https://api.semanticscholar.org/graph/v1/author/", authorID, "/?fields=name,hIndex,aliases", sep="")
   res <- fromJSON(rawToChar(GET(APICall)$content))
   if(!is.null(res$authorId)){
-    APICall <- paste("https://api.semanticscholar.org/graph/v1/author/", authorID, "/papers/?fields=year,title,venue,isOpenAccess,externalIds", sep="")
+    APICall <- paste("https://api.semanticscholar.org/graph/v1/author/", authorID, "/papers/?fields=year,title,venue,isOpenAccess,externalIds&limit=1000", sep="")
     res <- fromJSON(rawToChar(GET(APICall)$content))
     #toDo pick best method for print out
     print(res$data)
