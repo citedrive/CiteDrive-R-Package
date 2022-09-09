@@ -269,15 +269,7 @@ papersByAuthor <- function(authorID){
   if(!is.null(res$authorId)){
     APICall <- paste("https://api.semanticscholar.org/graph/v1/author/", authorID, "/papers/?fields=year,title,venue,isOpenAccess,externalIds&limit=1000", sep="")
     res <- fromJSON(rawToChar(GET(APICall)$content))
-    #toDo pick best method for print out
     print(res$data)
-    print("\nor\n")
-    tryCatch(
-      res$data$externalIds <- subset(res$data$externalIds, select=c(DOI)),
-      error = function(e){
-        print("No DOI in Semantic Scholar's Database! Printing other external IDs instead")
-      }
-    )
     return(subset(res$data, select=c(externalIds, title, venue, year, isOpenAccess)))
   }
   else{
