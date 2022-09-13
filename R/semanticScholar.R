@@ -216,8 +216,7 @@ tldr <- function(DOIorPaperID){
   APICall <- paste("https://api.semanticscholar.org/graph/v1/paper/",DOIorPaperID,"?fields=title,tldr", sep="")
   res <- fromJSON(rawToChar(GET(APICall)$content))
   if(!is.null(res$paperId)){
-  print(paste("Short summary of ", res$title, ":", sep = ""))
-  return(res$tldr$text)
+    return(res$tldr$text)
   }
   else{
     print(paste("Error:", DOIorPaperID, "not found in Semantic Scholar's Database!"))

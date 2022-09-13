@@ -139,8 +139,6 @@ workPublishedIn <- function(DOI){
               JournalInfo(tmp$ISSN[x])$publisher)
       res[nrow(res) + 1, ] <- dta
     }
-
-    print(paste("Printing Journal Infomation for", paperTitle, sep = " "))
     return(res)
   }
   print(paste("DOI", DOI, "was found in Crossref's Database"))
