@@ -60,7 +60,7 @@ findWorksByAuthor <- function(authorName,numberOfResults=20){
     res <- fromJSON(rawToChar(res$content))
     resTotal <- res$message$`total-results`
 
-    # prevents fetching of data larger than the maximum entires available
+    # prevents fetching of data larger than the maximum entries available
     if(resTotal < numberOfResults){
       numberOfResults <- resTotal
       APICall <- paste("https://api.crossref.org/works?select=DOI,type,title,is-referenced-by-count,references-count,author&query.author=", gsub(" ", "+", authorName),"&rows=",numberOfResults, sep="")
@@ -71,7 +71,7 @@ findWorksByAuthor <- function(authorName,numberOfResults=20){
 
     # fetch and append results > 1000
     if(actualnumberOfResults > 1000){
-      # prevents fetching of data larger than the maximum entires available
+      # prevents fetching of data larger than the maximum entries available
       if(resTotal < actualnumberOfResults){
         actualnumberOfResults <- resTotal
       }
@@ -171,7 +171,7 @@ findJournalByKeywords <- function(Keywords, numberOfResults=20){
     res <- fromJSON(rawToChar(res$content))
     resTotal <- res$message$`total-results`
 
-    # prevents fetching of data larger than the maximum entires available
+    # prevents fetching of data larger than the maximum entries available
     if(resTotal < numberOfResults){
       numberOfResults <- resTotal
       APICall <- paste("https://api.crossref.org/journals?query=", gsub(" ", "+", Keywords),"&rows=",numberOfResults, sep="")
@@ -182,7 +182,7 @@ findJournalByKeywords <- function(Keywords, numberOfResults=20){
 
     # fetch and append results > 1000
     if(actualnumberOfResults > 1000){
-      # prevents fetching of data larger than the maximum entires available
+      # prevents fetching of data larger than the maximum entries available
       if(resTotal < actualnumberOfResults){
         actualnumberOfResults <- resTotal
       }
@@ -259,7 +259,7 @@ JournalWorks <- function(ISSN, numberOfResults=20){
     res <- fromJSON(rawToChar(res$content))
     resTotal <- res$message$`total-results`
 
-    # prevents fetching of data larger than the maximum entires available
+    # prevents fetching of data larger than the maximum entries available
     if(resTotal < numberOfResults){
       numberOfResults <- resTotal
       APICall <- paste("https://api.crossref.org/journals/", ISSN,"/works", "?rows=",numberOfResults, sep="")
@@ -270,7 +270,7 @@ JournalWorks <- function(ISSN, numberOfResults=20){
 
     # fetch and append results > 1000
     if(actualnumberOfResults > 1000){
-      # prevents fetching of data larger than the maximum entires available
+      # prevents fetching of data larger than the maximum entries available
       if(resTotal < actualnumberOfResults){
         actualnumberOfResults <- resTotal
       }
