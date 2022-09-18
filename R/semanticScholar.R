@@ -4,9 +4,9 @@
 ########################https://api.semanticscholar.org#########################
 ################################################################################
 
-library(httr)
-library(jsonlite)
-library(plyr)
+require(httr)
+require(jsonlite)
+require(plyr)
 
 ##############################data sourced by paper#############################
 # input:  String (DOI or paperID)

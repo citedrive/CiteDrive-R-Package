@@ -4,8 +4,8 @@
 ############################https://api.crossref.org############################
 ################################################################################
 
-library(httr)
-library(jsonlite)
+require(httr)
+require(jsonlite)
 
 #User-Agent header used in all API Calls as per crossref etiquette section at https://api.crossref.org/swagger-ui/index.html
 #toDo CHANGE HEADER
