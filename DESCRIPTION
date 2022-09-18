@@ -14,4 +14,3 @@ Imports:
     jsonlite,
     plyr,
 	stringr
-
