@@ -72,7 +72,7 @@ fieldsOfStudy <- function(DOIorPaperID){
   }
 }
 
-#returns R Object of 10 entries or NULL
+# returns R Object of 10 entries or NULL
 # input:  String (keywords)
 # output: R Object or NULL
 # Description: Find papers matching a keyword

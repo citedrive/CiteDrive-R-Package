@@ -1,4 +1,4 @@
-require ("stringr")
+require("stringr")
 
 # input:  API String to synchronise CiteDrive's .bib file
 # output: R Object
