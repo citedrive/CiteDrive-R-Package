@@ -5,7 +5,7 @@ Version: 1.0.0
 Author: CiteDrive LLC
 Maintainer: Nadja Stieger <nadja.stieger@stud.hn.de>
 Description: The CiteDrive addin sources informetric metadata from Crossref (www.crossref.org) und Semantic Scholar
-(www.semanticscholar.org) and processes it for output or further usage with other R-functions.
+    (www.semanticscholar.org) and processes it for output or further usage with other R-functions.
 License: MIT
 Encoding: UTF-8
 LazyData: true
