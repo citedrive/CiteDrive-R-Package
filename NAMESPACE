@@ -1,5 +1,5 @@
 exportPattern("^[[:alpha:]]+")
 import(httr)
-importFrom(jsonlite.fromJSON)
+import(jsonlite)
 import(plyr)
 import(stringr)
